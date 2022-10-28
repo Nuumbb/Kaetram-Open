@@ -4,7 +4,7 @@ import { each, isArray } from 'lodash-es';
 import { io } from 'socket.io-client';
 
 import config from '@kaetram/common/config';
-import { Packets } from '@kaetram/common/network';
+import { Opcodes, Packets } from '@kaetram/common/network';
 import log from '@kaetram/common/util/log';
 import Utils from '@kaetram/common/util/utils';
 
@@ -20,7 +20,7 @@ interface PacketInfo {
 
 export default class Bot {
     #bots: Entity[] = [];
-    #botCount = 300;
+    #botCount = 1;
 
     public constructor() {
         this.load();
@@ -84,13 +84,17 @@ export default class Bot {
             return;
         }
 
-        console.log(message);
+        // console.log(message);
 
         let [opcode, info] = message;
 
         switch (opcode) {
             case Packets.Handshake:
-                this.send(connection, 1, [2, `n${this.#bots.length}`, 'n', 'n']);
+                this.send(connection, Packets.Login, {
+                    opcode: Opcodes.Login.Login,
+                    username: `n${this.#bots.length}`,
+                    password: 'n'
+                });
 
                 break;
 
@@ -105,7 +109,7 @@ export default class Bot {
         }
     }
 
-    private send(connection: Socket, packet: number, data: (string | number)[]): void {
+    private send(connection: Socket, packet: number, data?: unknown): void {
         let json = JSON.stringify([packet, data]);
 
         if (connection && connection.connected) connection.send(json);
@@ -120,25 +124,52 @@ export default class Bot {
         setTimeout(() => {
             // Movement Request
 
-            this.send(bot.connection, 9, [0, newX, newY, currentX, currentY]);
-        }, 250);
+            this.send(bot.connection, Packets.Movement, {
+                opcode: Opcodes.Movement.Request,
+                requestX: newX,
+                requestY: newY,
+                playerX: currentX,
+                playerY: currentY
+            });
+        }, 375);
 
         setTimeout(() => {
             // Empty target packet
 
-            this.send(bot.connection, 13, [2]);
+            this.send(bot.connection, Packets.Target, [Opcodes.Target.None]);
         }, 250);
 
         setTimeout(() => {
             // Start Movement
 
-            this.send(bot.connection, 9, [1, newX, newY, currentX, currentY, 250]);
+            this.send(bot.connection, Packets.Movement, {
+                opcode: Opcodes.Movement.Started,
+                requestX: newX,
+                requestY: newY,
+                playerX: currentX,
+                playerY: currentY,
+                movementSpeed: 250
+            });
         }, 250);
+
+        setTimeout(() => {
+            // Step Movement
+
+            this.send(bot.connection, Packets.Movement, {
+                opcode: Opcodes.Movement.Step,
+                playerX: currentX,
+                playerY: currentY
+            });
+        }, 500);
 
         setTimeout(() => {
             // Stop Movement
 
-            this.send(bot.connection, 9, [3, newX, newY]);
+            this.send(bot.connection, Packets.Movement, {
+                opcode: Opcodes.Movement.Stop,
+                playerX: newX,
+                playerY: newY
+            });
         }, 1000);
 
         bot.x = newX;
