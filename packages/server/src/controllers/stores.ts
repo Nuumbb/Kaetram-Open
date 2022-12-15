@@ -10,7 +10,7 @@ import NPC from '../game/entity/npc/npc';
 import Item from '../game/entity/objects/item';
 import Player from '../game/entity/character/player/player';
 
-import StoreEn from '@kaetram/common/text/en/store';
+import t from '@kaetram/common/text';
 
 import { Opcodes, Modules } from '@kaetram/common/network';
 import { Store as StorePacket } from '../network/packets';
@@ -68,7 +68,7 @@ export default class Stores {
         _.each(store.items, (item: StoreItem) => {
             // Skip if an item already exists with the same key.
             if (_.some(items, { key: item.key }))
-                return log.warning(`${StoreEn.WARNING_DUPLICATE}'${key}'.`);
+                return log.warning(`${t('WARNING_DUPLICATE')}'${key}'.`);
 
             let storeItem = new Item(item.key, -1, -1, false, item.count);
 
@@ -148,7 +148,7 @@ export default class Stores {
     public open(player: Player, npc: NPC): void {
         let store = this.getStore(npc);
 
-        if (!store) return log.debug(`[${player.username}] ${StoreEn.INVALID_STORE}.`);
+        if (!store) return log.debug(`[${player.username}] ${t('INVALID_STORE')}.`);
 
         player.send(new StorePacket(Opcodes.Store.Open, this.serialize(npc.store)));
 
@@ -169,16 +169,16 @@ export default class Stores {
         if (!this.verifyStore(player, storeKey)) return;
 
         // First and foremost check the user has enough space.
-        if (!player.inventory.hasSpace()) return player.notify(StoreEn.NOT_ENOUGH_SPACE);
+        if (!player.inventory.hasSpace()) return player.notify(t('NOT_ENOUGH_SPACE'));
 
         let store = this.stores[storeKey],
             item = store.items[index];
 
         // Check if item exists
         if (!item)
-            return log.error(`${player.username} ${StoreEn.PURCHASE_INVALID_STORE}${storeKey}.`);
+            return log.error(`${player.username} ${t('PURCHASE_INVALID_STORE')}${storeKey}.`);
 
-        if (item.count < 1) return player.notify(StoreEn.ITEM_OUT_OF_STOCK);
+        if (item.count < 1) return player.notify(t('ITEM_OUT_OF_STOCK'));
 
         // Prevent buying more than store has stock. Default to max stock.
         count = item.count < count ? item.count : count;
@@ -186,7 +186,7 @@ export default class Stores {
         // Find total price of item by multiplying count against price.
         let currency = player.inventory.getIndex(store.currency, item.price * count);
 
-        if (currency === -1) return player.notify(StoreEn.NOT_ENOUGH_CURRENCY);
+        if (currency === -1) return player.notify(t('NOT_ENOUGH_CURRENCY'));
 
         // Clone the item we are adding
         let itemToAdd = _.clone(item);
@@ -194,7 +194,7 @@ export default class Stores {
         itemToAdd.count = count;
 
         // Add the item to the player's inventory.
-        if (!player.inventory.add(itemToAdd)) return player.notify(StoreEn.NOT_ENOUGH_SPACE);
+        if (!player.inventory.add(itemToAdd)) return player.notify(t('NOT_ENOUGH_SPACE'));
 
         // Decrement the item count by the amount we are buying.
         item.count -= count;
@@ -228,7 +228,7 @@ export default class Stores {
 
         // Ensure the item in the slot exists.
         if (slot.isEmpty())
-            return log.warning(`[${player.username}] ${StoreEn.INVALID_ITEM_SELECTION}`);
+            return log.warning(`[${player.username}] ${t('INVALID_ITEM_SELECTION')}`);
 
         let store = this.stores[key];
 
@@ -238,7 +238,7 @@ export default class Stores {
          * project, is to be expected and frankly, quite reasonable.
          */
 
-        if (slot.key === store.currency) return player.notify(StoreEn.CANNOT_SELL_ITEM);
+        if (slot.key === store.currency) return player.notify(t('CANNOT_SELL_ITEM'));
 
         // Temporary fix until we have a more suitable UI.
         ({ count } = slot);
@@ -249,13 +249,13 @@ export default class Stores {
             price = Math.ceil((storeItem ? storeItem.price : item.price) / 2) * count; // Use store price or item default.
 
         // Items without prices (quest items) cannot be sold.
-        if (price < 0) return player.notify(StoreEn.CANNOT_SELL_ITEM);
+        if (price < 0) return player.notify(t('CANNOT_SELL_ITEM'));
 
         player.inventory.remove(index, count);
 
         // Very weird if this somehow happened at this point in the code, I'd be curious to see how.
         if (!player.inventory.add(this.getCurrency(store.currency, price)))
-            return player.notify(StoreEn.NOT_ENOUGH_CURRENCY);
+            return player.notify(t('NOT_ENOUGH_CURRENCY'));
 
         // Increment item amount in the store otherwise add item to store.
         if (storeItem) storeItem.count += count;
@@ -283,12 +283,12 @@ export default class Stores {
 
         // This shouldn't get called unless there is a bug or client was messed with.
         if (slot.isEmpty())
-            return log.warning(`[${player.username}] ${StoreEn.INVALID_ITEM_SELECTION}`);
+            return log.warning(`[${player.username}] ${t('INVALID_ITEM_SELECTION')}`);
 
         let store = this.stores[key];
 
         // Check that the player isn't trying to sell the currency to the store.
-        if (slot.key === store.currency) return player.notify(StoreEn.CANNOT_SELL_ITEM);
+        if (slot.key === store.currency) return player.notify(t('CANNOT_SELL_ITEM'));
 
         // Temporary fix until we have a more suitable UI.
         ({ count } = slot);
@@ -299,7 +299,7 @@ export default class Stores {
             price = Math.ceil((storeItem ? storeItem.price : item.price) / 2) * count; // Use store price or item default.
 
         // Items without prices (quest items) cannot be sold.
-        if (price < 1) return player.notify(StoreEn.CANNOT_SELL_ITEM);
+        if (price < 1) return player.notify(t('CANNOT_SELL_ITEM'));
 
         // Invalid price, this shouldn't happen.
         if (isNaN(price)) return log.error(`Malformed pricing for item selection.`);
@@ -342,7 +342,7 @@ export default class Stores {
 
     private verifyStore(player: Player, storeKey: string): boolean {
         if (player.storeOpen !== storeKey) {
-            log.warning(`[${player.username}] ${StoreEn.ACTION_STORE_NOT_OPEN}`);
+            log.warning(`[${player.username}] ${t('ACTION_STORE_NOT_OPEN')}`);
             return false;
         }
 
