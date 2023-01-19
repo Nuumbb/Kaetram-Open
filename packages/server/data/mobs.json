@@ -310,7 +310,7 @@
 
   "blackwizard": {
     "name": "Dark Wizard",
-    "drops": {"bastardsword": 100, "wizardrobe": 100, "redlightbow": 125, "topazring": 15},
+    "drops": {"bastardsword": 100, "wizardrobe": 100, "redlightbow": 125},
     "hitPoints": 120,
     "defenseLevel": 2,
     "attackLevel": 10,
@@ -1732,7 +1732,7 @@
 
   "skeletonking": {
     "name": "Skeleton King",
-    "drops": {"goldensword": 100, "bigflask": 250, "goldenbow": 50, "pearlpendant": 40, "pearlring": 40},
+    "drops": {"goldensword": 20, "bigflask": 250, "goldenbow": 20, "pearlpendant": 25, "pearlring": 25},
     "hitPoints": 1850,
     "defenseLevel": 20,
     "attackLevel": 7,
@@ -1842,7 +1842,7 @@
 
   "miniseadragon": {
     "name": "Mini Sea Dragon",
-    "drops": {"miniseadragonarmor": 300, "daywalker": 300, "gold": 400},
+    "drops": {"miniseadragonarmor": 75, "daywalker": 75, "gold": 400},
     "hitPoints": 1200,
     "defenseLevel": 22,
     "attackLevel": 15,
@@ -1859,7 +1859,7 @@
 
   "forestdragon": {
     "name": "Forest Dragon",
-    "drops": {"dragonarmor": 75, "bamboospear": 75, "gold": 900, "marblependant": 75, "essentialrage": 75},
+    "drops": {"dragonarmor": 17, "bamboospear": 17, "gold": 900, "marblependant": 50, "essentialrage": 25},
     "hitPoints": 6942,
     "defenseLevel": 10,
     "attackLevel": 80,
@@ -1913,7 +1913,7 @@
 
   "minidragon": {
     "name": "Mini Dragon",
-    "drops": {"dragonarmor": 3, "gold": 400},
+    "drops": {"gold": 400},
     "hitPoints": 380,
     "defenseLevel": 5,
     "attackLevel": 15,
@@ -1967,7 +1967,7 @@
 
   "queenant": {
     "name": "Queen Ant",
-    "drops": {"ironknightarmor": 50, "justicebow": 50, "whip": 50, "gold": 400, "bigflask": 100},
+    "drops": {"ironknightarmor": 17, "justicebow": 17, "whip": 17, "gold": 400, "bigflask": 100, "topazring": 25},
     "hitPoints": 4200,
     "defenseLevel": 75,
     "attackLevel": 30,
